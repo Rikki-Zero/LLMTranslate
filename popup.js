@@ -1,6 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   // 加载场景和设置
   chrome.storage.sync.get(['translatorConfig', 'triggerMode'], (result) => {
+    if (!result) {
+      result = {
+        translatorConfig: { scenarios: [] },
+        triggerMode: 'hover'
+      };
+    }
+    
     // 加载场景
     const scenarioSelect = document.getElementById('scenarioSelect');
     scenarioSelect.innerHTML = '';

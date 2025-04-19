@@ -7,8 +7,16 @@ let config = {
 
 // 加载保存的配置
 chrome.storage.sync.get(['translatorConfig'], (result) => {
-  if (result.translatorConfig) {
+  if (result && result.translatorConfig) {
     config = result.translatorConfig;
+  } else {
+    // 初始化默认配置
+    config = {
+      apiEndpoint: 'https://api.openai.com/v1/chat/completions',
+      apiKey: '',
+      scenarios: []
+    };
+    chrome.storage.sync.set({ translatorConfig: config });
   }
 });
 

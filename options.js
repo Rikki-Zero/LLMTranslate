@@ -2,18 +2,53 @@
 let saveTimer = null;
 const SAVE_DELAY = 1000; // 1秒延迟保存
 
+// 显示加载状态
+function showLoading() {
+    document.getElementById('apiEndpoint').placeholder = '加载中...';
+    document.getElementById('apiKey').placeholder = '加载中...';
+}
+
 // 加载配置
 function loadConfig() {
     chrome.storage.sync.get(['translatorConfig'], (result) => {
-        const config = result.translatorConfig || {
-            apiEndpoint: 'https://api.openai.com/v1/chat/completions',
-            apiKey: '',
-            scenarios: []
-        };
+        if (!result || !result.translatorConfig) {
+            // 初始化默认配置
+            const defaultConfig = {
+                apiEndpoint: 'https://api.openai.com/v1/chat/completions',
+                apiKey: '',
+                scenarios: []
+            };
+            chrome.storage.sync.set({ translatorConfig: defaultConfig }, () => {
+                updateUIWithConfig(defaultConfig);
+            });
+            return;
+        }
 
+        showLoading();
+        updateUIWithConfig(result.translatorConfig);
+    });
+}
+
+// 使用配置更新UI
+function updateUIWithConfig(config) {
+    try {
         // 填充API配置
-        document.getElementById('apiEndpoint').value = config.apiEndpoint;
-        document.getElementById('apiKey').value = config.apiKey;
+        const endpointEl = document.getElementById('apiEndpoint');
+        const keyEl = document.getElementById('apiKey');
+
+        endpointEl.value = config.apiEndpoint;
+        endpointEl.placeholder = 'https://api.openai.com/v1/chat/completions';
+
+        keyEl.value = config.apiKey;
+        keyEl.placeholder = '输入你的OpenAI API密钥';
+
+        // 确保加载完成后状态正确
+        if (!config.apiEndpoint) {
+            endpointEl.placeholder = 'https://api.openai.com/v1/chat/completions';
+        }
+        if (!config.apiKey) {
+            keyEl.placeholder = '输入你的OpenAI API密钥';
+        }
 
         // 填充场景组
         const container = document.getElementById('scenariosContainer');
@@ -21,7 +56,12 @@ function loadConfig() {
         config.scenarios.forEach(scenario => {
             addScenarioToUI(scenario);
         });
-    });
+    } catch (error) {
+        console.error('配置加载错误:', error);
+        // 恢复默认placeholder
+        document.getElementById('apiEndpoint').placeholder = 'https://api.openai.com/v1/chat/completions';
+        document.getElementById('apiKey').placeholder = '输入你的OpenAI API密钥';
+    }
 }
 
 // 保存配置
@@ -47,6 +87,9 @@ function saveConfig() {
     // 保存到存储
     chrome.storage.sync.set({ translatorConfig: config }, () => {
         showStatus('apiStatus', '配置已保存');
+        // 更新字段显示已保存的值
+        document.getElementById('apiEndpoint').value = config.apiEndpoint;
+        document.getElementById('apiKey').value = config.apiKey;
     });
 }
 
@@ -95,9 +138,39 @@ function addScenarioToUI(scenario) {
     document.getElementById('scenariosContainer').appendChild(el);
 }
 
+// 显示加载状态
+function showLoading() {
+    document.getElementById('apiEndpoint').placeholder = '加载中...';
+    document.getElementById('apiKey').placeholder = '加载中...';
+}
+
+// 确保元素存在
+function ensureElements() {
+    const elements = [
+        'apiEndpoint',
+        'apiKey',
+        'scenariosContainer',
+        'addScenario'
+    ];
+    elements.forEach(id => {
+        if (!document.getElementById(id)) {
+            throw new Error(`元素 ${id} 未找到`);
+        }
+    });
+}
+
 // 初始化页面
 document.addEventListener('DOMContentLoaded', () => {
-    loadConfig();
+    try {
+        ensureElements();
+        // 直接加载配置，由loadConfig决定是否显示加载状态
+        loadConfig();
+    } catch (error) {
+        console.error('初始化错误:', error);
+        // 恢复默认placeholder
+        document.getElementById('apiEndpoint').placeholder = 'https://api.openai.com/v1/chat/completions';
+        document.getElementById('apiKey').placeholder = '输入你的OpenAI API密钥';
+    }
 
     // API配置自动保存
     document.getElementById('apiEndpoint').addEventListener('input', () => {
