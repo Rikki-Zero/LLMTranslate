@@ -24,10 +24,10 @@ floatingButton.style.display = 'none';
 document.body.appendChild(floatingButton);
 
 let selectedText = '';
-let selectionRect = null;
+let selectionRect: DOMRect | null = null;
 
 // 显示悬浮按钮
-function showFloatingButton(rect) {
+function showFloatingButton(rect: DOMRect) {
   floatingButton.style.display = 'block';
   floatingButton.style.left = `${rect.right + window.scrollX}px`;
   floatingButton.style.top = `${rect.top + window.scrollY}px`;
@@ -41,7 +41,7 @@ function hideFloatingElements() {
 
 // 加载触发模式
 let triggerMode = 'hover';
-chrome.storage.sync.get(['triggerMode'], (result) => {
+browser.storage.sync.get(['triggerMode']).then((result) => {
   triggerMode = result.triggerMode || 'hover';
 });
 
@@ -58,19 +58,21 @@ document.addEventListener('selectionchange', () => {
 
   selectionRect = selection.getRangeAt(0).getBoundingClientRect();
   
-  if (triggerMode === 'hover') {
+  if (triggerMode === 'hover' && selectionRect) {
     showFloatingButton(selectionRect);
-  } else if (triggerMode === 'auto') {
-    chrome.runtime.sendMessage({
+  } else if (triggerMode === 'auto' && selectionRect) {
+    browser.runtime.sendMessage({
       action: 'translate',
       text: selectedText,
-      scenarioId: 'default' // 使用默认场景或第一个场景
-    }, (response) => {
+      scenarioId: 'default'
+    }).then((response) => {
       if (response?.success) {
-        floatingPanel.textContent = response.result;
-        floatingPanel.style.display = 'block';
-        floatingPanel.style.left = `${selectionRect.left + window.scrollX}px`;
-        floatingPanel.style.top = `${selectionRect.bottom + window.scrollY + 5}px`;
+        if (selectionRect) {
+          floatingPanel.textContent = response.result;
+          floatingPanel.style.display = 'block';
+          floatingPanel.style.left = `${selectionRect.left + window.scrollX}px`;
+          floatingPanel.style.top = `${selectionRect.bottom + window.scrollY + 5}px`;
+        }
       }
     });
   }
@@ -78,12 +80,14 @@ document.addEventListener('selectionchange', () => {
 
 // 点击悬浮按钮处理
 floatingButton.addEventListener('click', () => {
-  chrome.runtime.sendMessage({
+  if (!selectionRect) return;
+  
+  browser.runtime.sendMessage({
     action: 'translate',
     text: selectedText,
-    scenarioId: 'default' // 暂时使用默认场景
-  }, (response) => {
-    if (response?.success) {
+    scenarioId: 'default'
+  }).then((response) => {
+    if (response?.success && selectionRect) {
       floatingPanel.textContent = response.result;
       floatingPanel.style.display = 'block';
       floatingPanel.style.left = `${selectionRect.left + window.scrollX}px`;

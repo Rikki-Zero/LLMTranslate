@@ -9,8 +9,11 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.315",
     "typescript": "~5.7.2",
-    "vite": "^6.3.1"
+    "vite": "^6.3.1",
+    "vite-plugin-web-extension": "^4.4.3",
+    "webextension-polyfill": "^0.12.0"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.4",
