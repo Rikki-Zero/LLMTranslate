@@ -10,7 +10,8 @@
     "storage",
     "contextMenus",
     "activeTab",
-    "clipboardWrite"
+    "clipboardWrite",
+    "management"
   ],
   "background": {
     "scripts": ["background.js"]

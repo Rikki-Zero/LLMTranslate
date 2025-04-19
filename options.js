@@ -10,7 +10,12 @@ function showLoading() {
 
 // 加载配置
 function loadConfig() {
-    chrome.storage.sync.get(['translatorConfig'], (result) => {
+    chrome.storage.local.get(['translatorConfig'], (result) => {
+        if (chrome.runtime.lastError) {
+            console.error('配置加载错误:', chrome.runtime.lastError);
+            return;
+        }
+
         if (!result || !result.translatorConfig) {
             // 初始化默认配置
             const defaultConfig = {
@@ -18,8 +23,12 @@ function loadConfig() {
                 apiKey: '',
                 scenarios: []
             };
-            chrome.storage.sync.set({ translatorConfig: defaultConfig }, () => {
-                updateUIWithConfig(defaultConfig);
+            chrome.storage.local.set({ translatorConfig: defaultConfig }, () => {
+                if (chrome.runtime.lastError) {
+                    console.error('默认配置保存失败:', chrome.runtime.lastError);
+                } else {
+                    updateUIWithConfig(defaultConfig);
+                }
             });
             return;
         }
@@ -85,11 +94,15 @@ function saveConfig() {
     });
 
     // 保存到存储
-    chrome.storage.sync.set({ translatorConfig: config }, () => {
-        showStatus('apiStatus', '配置已保存');
-        // 更新字段显示已保存的值
-        document.getElementById('apiEndpoint').value = config.apiEndpoint;
-        document.getElementById('apiKey').value = config.apiKey;
+    chrome.storage.local.set({ translatorConfig: config }, () => {
+        if (chrome.runtime.lastError) {
+            showStatus('apiStatus', '保存失败: ' + chrome.runtime.lastError.message);
+        } else {
+            showStatus('apiStatus', '配置已保存');
+            // 更新字段显示已保存的值
+            document.getElementById('apiEndpoint').value = config.apiEndpoint;
+            document.getElementById('apiKey').value = config.apiKey;
+        }
     });
 }
 

@@ -1,7 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   // 加载场景和设置
-  chrome.storage.sync.get(['translatorConfig', 'triggerMode'], (result) => {
-    if (!result) {
+  chrome.storage.local.get(['translatorConfig', 'triggerMode'], (result) => {
+    if (chrome.runtime.lastError) {
+      console.error('配置加载错误:', chrome.runtime.lastError);
+      result = {
+        translatorConfig: { scenarios: [] },
+        triggerMode: 'hover'
+      };
+    } else if (!result) {
       result = {
         translatorConfig: { scenarios: [] },
         triggerMode: 'hover'
@@ -32,9 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // 保存触发方式设置
   document.getElementById('saveTrigger').addEventListener('click', () => {
     const triggerMode = document.querySelector('input[name="trigger"]:checked').value;
-    chrome.storage.sync.set({ triggerMode }, () => {
-      alert('触发方式已保存');
-      window.close();
+    chrome.storage.local.set({ triggerMode }, () => {
+      if (chrome.runtime.lastError) {
+        alert('保存失败: ' + chrome.runtime.lastError.message);
+      } else {
+        alert('触发方式已保存');
+        window.close();
+      }
     });
   });
 });
