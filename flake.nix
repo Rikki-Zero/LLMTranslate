@@ -14,9 +14,7 @@
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             nodejs_20
-            nodePackages.tailwindcss
-            nodePackages.postcss
-            nodePackages.autoprefixer
+            pnpm
           ];
         };
       }
