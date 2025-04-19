@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>LLM Translator</title>
+    <style>
+      body {
+        width: 300px;
+        padding: 16px;
+        font-family: Arial, sans-serif;
+      }
+      .section {
+        margin-bottom: 16px;
+      }
+      select,
+      button {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 12px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+      .radio-group {
+        margin-bottom: 12px;
+      }
+      .radio-option {
+        margin-bottom: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="section">
+      <label for="scenarioSelect">选择翻译场景</label>
+      <select id="scenarioSelect">
+        <option value="">加载中...</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <label>触发方式</label>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input
+            type="radio"
+            id="triggerHover"
+            name="trigger"
+            value="hover"
+            checked
+          />
+          <label for="triggerHover">悬浮按钮点击</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="triggerAuto" name="trigger" value="auto" />
+          <label for="triggerAuto">自动触发</label>
+        </div>
+      </div>
+    </div>
+
+    <button id="saveTrigger">保存设置</button>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
