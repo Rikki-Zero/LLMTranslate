@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "LLM Pipeline",
   "version": "0.0.1",
   "description": "使用OpenAI API进行文本处理的浏览器扩展",
@@ -11,10 +11,11 @@
     "contextMenus",
     "activeTab",
     "clipboardWrite",
-    "management"
+    "scripting"
   ],
   "background": {
-    "service_worker": "src/background.ts"
+    "service_worker": "src/background.ts",
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -22,8 +23,11 @@
       "js": ["src/content.ts"]
     }
   ],
-  "browser_action": {
-    "default_icon": "icons/icon-32.png",
+  "action": {
+    "default_icon": {
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    },
     "default_title": "LLM Pipeline",
     "default_popup": "src/popup.html"
   },

@@ -5,6 +5,8 @@ import webExtension from 'vite-plugin-web-extension'
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    webExtension()
+    webExtension({
+      browser: "firefox"
+    })
   ]
 })
