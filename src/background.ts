@@ -12,20 +12,6 @@ let config: TranslatorConfig = {
   scenarios: []
 };
 
-// 调试存储状态
-async function debugStorage() {
-  try {
-    const items = await browser.storage.local.get(null);
-    console.log('当前存储内容:', items);
-  } catch (error) {
-    console.error('存储读取错误:', error);
-  }
-}
-
-// 每5分钟检查一次存储状态
-setInterval(debugStorage, 5 * 60 * 1000);
-
-
 // 处理API请求
 async function callOpenAI(prompt: string, model: string, systemMessage: string): Promise<string | null> {
   try {
